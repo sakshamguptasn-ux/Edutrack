@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+{% block title %}{{ project['title'] }} — EduTrack{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>{{ project['title'] }}
+        <span class="badge-status {{ project['status']|status_class }}">{{ project['status']|status_display }}</span>
+    </h2>
+</div>
+
+<!-- Info Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3"><div class="card p-3"><strong>Assignment</strong><br>{{ project['assignment_title'] }}</div></div>
+    <div class="col-md-3"><div class="card p-3"><strong>Team</strong><br>{{ project['team_name'] }}</div></div>
+    <div class="col-md-3"><div class="card p-3"><strong>Faculty</strong><br>{{ project['faculty_name'] }}</div></div>
+    <div class="col-md-3"><div class="card p-3"><strong>Status</strong><br><span class="badge-status {{ project['status']|status_class }}">{{ project['status']|status_display }}</span></div></div>
+</div>
+
+<!-- Description -->
+<div class="card mb-4">
+    <div class="card-header"><h5 class="mb-0">Project Description</h5></div>
+    <div class="card-body"><p>{{ project['description'] or 'No description provided.' }}</p></div>
+</div>
+
+<!-- Proposal Section -->
+<div class="card mb-4">
+    <div class="card-header"><h5 class="mb-0"><i class="bi bi-file-text me-2"></i>Proposal</h5></div>
+    <div class="card-body">
+        {% if project['status'] == 'DRAFT' %}
+        <p class="text-muted">Your proposal has not been submitted yet.</p>
+        <form method="POST" action="{{ url_for('student.submit_proposal', project_id=project['project_id']) }}">
+            <button type="submit" class="btn btn-primary" onclick="return confirm('Submit your proposal for review?')">
+                <i class="bi bi-send me-1"></i>Submit Proposal
+            </button>
+        </form>
+        {% elif project['status'] == 'UNDER_REVIEW' %}
+        <div class="alert alert-info mb-0"><i class="bi bi-hourglass-split me-1"></i>Your proposal is currently under review.</div>
+        {% elif project['status'] == 'REVISION_REQUESTED' %}
+        <div class="alert alert-warning">
+            <i class="bi bi-exclamation-triangle me-1"></i>Faculty has requested a revision to your proposal.
+        </div>
+        <form method="POST" action="{{ url_for('student.resubmit_proposal', project_id=project['project_id']) }}">
+            <button type="submit" class="btn btn-warning" onclick="return confirm('Resubmit your proposal?')">
+                <i class="bi bi-arrow-clockwise me-1"></i>Resubmit Proposal
+            </button>
+        </form>
+        {% elif project['status'] in ['APPROVED', 'IN_PROGRESS', 'COMPLETED'] %}
+        <div class="alert alert-success mb-0"><i class="bi bi-check-circle me-1"></i>Proposal has been approved.</div>
+        {% endif %}
+
+        <!-- Review History -->
+        {% if reviews %}
+        <h6 class="mt-3 mb-2">Review History</h6>
+        {% for r in reviews %}
+        <div class="review-entry {{ 'approved' if r['decision'] == 'APPROVED' else 'revision' }}">
+            <div class="d-flex justify-content-between">
+                <span>
+                    <span class="badge-status {{ 'badge-approved' if r['decision'] == 'APPROVED' else 'badge-revision' }}">
+                        {{ r['decision']|status_display }}
+                    </span>
+                    <strong class="ms-2">{{ r['faculty_name'] }}</strong>
+                </span>
+                <small class="text-muted">{{ r['created_at']|format_datetime }}</small>
+            </div>
+            <p class="mt-1 mb-0">{{ r['comment'] }}</p>
+        </div>
+        {% endfor %}
+        {% endif %}
+    </div>
+</div>
+
+<!-- Milestones -->
+<div class="card mb-4">
+    <div class="card-header"><h5 class="mb-0"><i class="bi bi-flag me-2"></i>Milestones</h5></div>
+    <div class="card-body">
+        {% if milestones %}
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead><tr><th>Title</th><th>Due Date</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody>
+                {% for m in milestones %}
+                <tr>
+                    <td>{{ m['title'] }}<br><small class="text-muted">{{ m['description']|truncate(80) if m['description'] }}</small></td>
+                    <td>{{ m['due_date']|format_date }}</td>
+                    <td><span class="badge-status {{ m['status']|status_class }}">{{ m['status']|status_display }}</span></td>
+                    <td>
+                        {% if m['status'] in ['PENDING', 'SUBMITTED'] %}
+                        <a href="{{ url_for('student.milestone_submit', project_id=project['project_id'], milestone_id=m['milestone_id']) }}" class="btn btn-sm btn-outline-primary">Submit Work</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state"><i class="bi bi-flag"></i><p>No milestones assigned yet.</p></div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Submissions -->
+<div class="card mb-4">
+    <div class="card-header"><h5 class="mb-0"><i class="bi bi-file-earmark-arrow-up me-2"></i>Submissions</h5></div>
+    <div class="card-body">
+        {% if submissions %}
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead><tr><th>File</th><th>Milestone</th><th>Type</th><th>Status</th><th>Date</th></tr></thead>
+                <tbody>
+                {% for s in submissions %}
+                <tr>
+                    <td><a href="{{ url_for('auth.download_file', filename=s['stored_filename']) }}"><i class="bi bi-file-earmark me-1"></i>{{ s['original_filename'] }}</a></td>
+                    <td>{{ s['milestone_title'] or '—' }}</td>
+                    <td>{{ s['submission_type'] }}</td>
+                    <td><span class="badge-status {{ s['status']|status_class }}">{{ s['status']|status_display }}</span></td>
+                    <td>{{ s['submitted_at']|format_datetime }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state"><i class="bi bi-file-earmark-x"></i><p>No submissions yet.</p></div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Feedback -->
+<div class="card mb-4">
+    <div class="card-header"><h5 class="mb-0"><i class="bi bi-chat-dots me-2"></i>Feedback</h5></div>
+    <div class="card-body">
+        {% if feedbacks %}
+        {% for fb in feedbacks %}
+        <div class="border-bottom pb-2 mb-2">
+            <div class="d-flex justify-content-between">
+                <strong>{{ fb['submission_name'] }}</strong>
+                <small class="text-muted">{{ fb['created_at']|format_datetime }}</small>
+            </div>
+            <p class="mb-0 mt-1"><em>{{ fb['faculty_name'] }}:</em> {{ fb['comment'] }}</p>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="empty-state"><i class="bi bi-chat"></i><p>No feedback available.</p></div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Evaluation -->
+<div class="card mb-4">
+    <div class="card-header"><h5 class="mb-0"><i class="bi bi-trophy me-2"></i>Evaluation</h5></div>
+    <div class="card-body">
+        {% if evaluation %}
+        <div class="row">
+            <div class="col-md-4"><h4>Grade: <span class="text-primary">{{ evaluation['grade'] }}</span></h4></div>
+            <div class="col-md-8">
+                <p>{{ evaluation['comments'] }}</p>
+                <small class="text-muted">Evaluated: {{ evaluation['evaluated_at']|format_datetime }}</small>
+            </div>
+        </div>
+        {% else %}
+        <div class="empty-state"><i class="bi bi-trophy"></i><p>Project has not been evaluated yet.</p></div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Final Submission Button -->
+{% if project['status'] in ['IN_PROGRESS', 'APPROVED'] %}
+<a href="{{ url_for('student.final_submit', project_id=project['project_id']) }}" class="btn btn-success">
+    <i class="bi bi-check-circle me-1"></i>Final Submission
+</a>
+{% endif %}
+
+<a href="{{ url_for('student.dashboard') }}" class="btn btn-outline-secondary ms-2"><i class="bi bi-arrow-left me-1"></i>Back to Dashboard</a>
+{% endblock %}

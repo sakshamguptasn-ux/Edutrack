@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Create Assignment — EduTrack{% endblock %}
+
+{% block content %}
+<div class="page-header"><h2><i class="bi bi-plus-circle me-2"></i>Create Assignment</h2></div>
+<div class="row"><div class="col-md-8">
+<div class="card"><div class="card-body">
+    <form method="POST">
+        <div class="mb-3"><label class="form-label">Title</label><input type="text" class="form-control" name="title" required></div>
+        <div class="mb-3"><label class="form-label">Description</label><textarea class="form-control" name="description" rows="3"></textarea></div>
+        <div class="mb-3"><label class="form-label">Instructions</label><textarea class="form-control" name="instructions" rows="3"></textarea></div>
+        <div class="mb-3"><label class="form-label">Deadline</label><input type="date" class="form-control" name="deadline"></div>
+        <div class="mb-3"><label class="form-label">Status</label>
+            <select class="form-select" name="status"><option value="OPEN">Open</option><option value="CLOSED">Closed</option></select>
+        </div>
+        <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle me-1"></i>Create</button>
+        <a href="{{ url_for('faculty.assignments') }}" class="btn btn-outline-secondary ms-2">Cancel</a>
+    </form>
+</div></div>
+</div></div>
+{% endblock %}

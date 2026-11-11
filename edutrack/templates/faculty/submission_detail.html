@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Submission Detail — EduTrack{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-center">
+    <h2><i class="bi bi-file-earmark-arrow-up me-2"></i>Submission Detail</h2>
+    <a href="{{ url_for('faculty.project_detail', project_id=submission['project_id']) }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back to Project</a>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-7">
+        <div class="card mb-4">
+            <div class="card-body">
+                <table class="table table-borderless mb-0">
+                    <tbody>
+                        <tr><th style="width: 30%;">File</th><td><a href="{{ url_for('auth.download_file', filename=submission['stored_filename']) }}"><i class="bi bi-file-earmark me-1"></i>{{ submission['original_filename'] }}</a></td></tr>
+                        <tr><th>Project</th><td>{{ submission['project_title'] }}</td></tr>
+                        <tr><th>Type</th><td>{{ submission['submission_type'] }}</td></tr>
+                        {% if submission['submission_type'] == 'MILESTONE' %}
+                        <tr><th>Milestone</th><td>{{ submission['milestone_title'] }}</td></tr>
+                        {% endif %}
+                        <tr><th>Submitted By</th><td>{{ submission['student_name'] }}</td></tr>
+                        <tr><th>Date</th><td>{{ submission['submitted_at']|format_datetime }}</td></tr>
+                        <tr><th>Status</th><td><span class="badge-status {{ submission['status']|status_class }}">{{ submission['status']|status_display }}</span></td></tr>
+                        <tr><th>Description</th><td>{{ submission['description'] or 'None provided.' }}</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-5">
+        <div class="card mb-4">
+            <div class="card-header"><h5 class="mb-0">Add Feedback</h5></div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('faculty.add_feedback', submission_id=submission['submission_id']) }}">
+                    <div class="mb-3">
+                        <textarea class="form-control" name="comment" rows="4" required placeholder="Enter feedback..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-send me-1"></i>Submit Feedback</button>
+                </form>
+            </div>
+        </div>
+
+        {% if feedbacks %}
+        <div class="card">
+            <div class="card-header"><h5 class="mb-0">Previous Feedback</h5></div>
+            <div class="card-body">
+                {% for fb in feedbacks %}
+                <div class="border-bottom pb-2 mb-2">
+                    <div class="d-flex justify-content-between">
+                        <strong>{{ fb['faculty_name'] }}</strong>
+                        <small class="text-muted">{{ fb['created_at']|format_datetime }}</small>
+                    </div>
+                    <p class="mb-0 mt-1">{{ fb['comment'] }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

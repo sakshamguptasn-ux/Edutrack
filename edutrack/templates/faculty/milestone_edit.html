@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Edit Milestone — EduTrack{% endblock %}
+
+{% block content %}
+<div class="page-header"><h2><i class="bi bi-flag me-2"></i>Edit Milestone</h2></div>
+<div class="row"><div class="col-md-8">
+<div class="card"><div class="card-body">
+    <form method="POST">
+        <div class="mb-3"><label class="form-label">Title</label><input type="text" class="form-control" name="title" value="{{ milestone['title'] }}" required></div>
+        <div class="mb-3"><label class="form-label">Description</label><textarea class="form-control" name="description" rows="3">{{ milestone['description'] or '' }}</textarea></div>
+        <div class="mb-3"><label class="form-label">Due Date</label><input type="date" class="form-control" name="due_date" value="{{ milestone['due_date'] or '' }}"></div>
+        <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle me-1"></i>Save Changes</button>
+        <a href="{{ url_for('faculty.project_detail', project_id=project['project_id']) }}" class="btn btn-outline-secondary ms-2">Cancel</a>
+    </form>
+</div></div>
+</div></div>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Evaluate Project — EduTrack{% endblock %}
+
+{% block content %}
+<div class="page-header"><h2><i class="bi bi-trophy me-2"></i>Evaluate Project: {{ project['title'] }}</h2></div>
+<div class="row"><div class="col-md-8">
+<div class="card"><div class="card-body">
+    <form method="POST">
+        <div class="mb-3"><label class="form-label">Grade</label>
+            <input type="text" class="form-control" name="grade" value="{{ evaluation['grade'] if evaluation else '' }}" required placeholder="e.g. A, B+, 95/100">
+        </div>
+        <div class="mb-3"><label class="form-label">Comments</label>
+            <textarea class="form-control" name="comments" rows="5">{{ evaluation['comments'] if evaluation else '' }}</textarea>
+        </div>
+        <div class="alert alert-warning"><i class="bi bi-exclamation-triangle me-1"></i>Evaluating this project will mark its status as <strong>Completed</strong>.</div>
+        <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle me-1"></i>Save Evaluation</button>
+        <a href="{{ url_for('faculty.project_detail', project_id=project['project_id']) }}" class="btn btn-outline-secondary ms-2">Cancel</a>
+    </form>
+</div></div>
+</div></div>
+{% endblock %}

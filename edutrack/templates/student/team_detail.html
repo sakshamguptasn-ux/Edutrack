@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}{{ team['team_name'] }} — EduTrack{% endblock %}
+
+{% block content %}
+<div class="page-header"><h2><i class="bi bi-people me-2"></i>{{ team['team_name'] }}</h2></div>
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header"><h5 class="mb-0">Team Members</h5></div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                {% for m in members %}
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span><i class="bi bi-person me-2"></i>{{ m['name'] }}</span>
+                        <span class="text-muted">{{ m['email'] }}</span>
+                    </li>
+                {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><h5 class="mb-0">Add Member</h5></div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('student.team_add_member', team_id=team['team_id']) }}">
+                    <div class="input-group">
+                        <input type="email" name="email" class="form-control" placeholder="Student email address" required>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-person-plus me-1"></i>Add</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><h5 class="mb-0">Team Projects</h5></div>
+            <div class="card-body">
+                {% if projects %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead><tr><th>Title</th><th>Assignment</th><th>Status</th><th></th></tr></thead>
+                        <tbody>
+                        {% for p in projects %}
+                        <tr>
+                            <td>{{ p['title'] }}</td>
+                            <td>{{ p['assignment_title'] }}</td>
+                            <td><span class="badge-status {{ p['status']|status_class }}">{{ p['status']|status_display }}</span></td>
+                            <td><a href="{{ url_for('student.project_detail', project_id=p['project_id']) }}" class="btn btn-sm btn-outline-primary">View</a></td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="empty-state"><i class="bi bi-folder-x"></i><p>No projects yet.</p></div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<a href="{{ url_for('student.teams') }}" class="btn btn-outline-secondary mt-3"><i class="bi bi-arrow-left me-1"></i>Back to Teams</a>
+{% endblock %}

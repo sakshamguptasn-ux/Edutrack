@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}Student Dashboard — EduTrack{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-center">
+    <h2><i class="bi bi-speedometer2 me-2"></i>Student Dashboard</h2>
+    <span class="text-muted">Welcome, {{ session.get('user_name', '') }}</span>
+</div>
+
+<!-- Stat Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="stat-value">{{ open_assignments }}</div>
+            <div class="stat-label">Open Assignments</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="stat-value">{{ projects|length }}</div>
+            <div class="stat-label">My Projects</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="stat-value">{{ milestones|length }}</div>
+            <div class="stat-label">Pending Milestones</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="stat-value">{{ unread_notifications|length }}</div>
+            <div class="stat-label">Unread Notifications</div>
+        </div>
+    </div>
+</div>
+
+<!-- My Projects -->
+<div class="card mb-4">
+    <div class="card-header"><h5 class="mb-0"><i class="bi bi-folder me-2"></i>My Projects</h5></div>
+    <div class="card-body">
+        {% if projects %}
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead><tr><th>Project</th><th>Assignment</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody>
+                {% for p in projects %}
+                <tr>
+                    <td>{{ p['title'] }}</td>
+                    <td>{{ p['assignment_title'] }}</td>
+                    <td><span class="badge-status {{ p['status']|status_class }}">{{ p['status']|status_display }}</span></td>
+                    <td><a href="{{ url_for('student.project_detail', project_id=p['project_id']) }}" class="btn btn-sm btn-outline-primary">View</a></td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state"><i class="bi bi-folder-x"></i><p>You have no projects yet.</p>
+            <a href="{{ url_for('student.assignments') }}" class="btn btn-primary btn-sm">Browse Assignments</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Upcoming Milestones -->
+<div class="card mb-4">
+    <div class="card-header"><h5 class="mb-0"><i class="bi bi-flag me-2"></i>Upcoming Milestones</h5></div>
+    <div class="card-body">
+        {% if milestones %}
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead><tr><th>Milestone</th><th>Project</th><th>Due Date</th><th>Status</th></tr></thead>
+                <tbody>
+                {% for m in milestones %}
+                <tr>
+                    <td>{{ m['title'] }}</td>
+                    <td>{{ m['project_title'] }}</td>
+                    <td>{{ m['due_date']|format_date }}</td>
+                    <td><span class="badge-status {{ m['status']|status_class }}">{{ m['status']|status_display }}</span></td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state"><i class="bi bi-check-circle"></i><p>No pending milestones.</p></div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Recent Feedback -->
+<div class="card mb-4">
+    <div class="card-header"><h5 class="mb-0"><i class="bi bi-chat-dots me-2"></i>Recent Feedback</h5></div>
+    <div class="card-body">
+        {% if feedbacks %}
+        {% for fb in feedbacks %}
+        <div class="border-bottom pb-2 mb-2">
+            <strong>{{ fb['submission_name'] }}</strong>
+            <p class="mb-1">{{ fb['comment'] }}</p>
+            <small class="text-muted">{{ fb['created_at']|format_datetime }}</small>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="empty-state"><i class="bi bi-chat"></i><p>No feedback available.</p></div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard — EduTrack{% endblock %}
+
+{% block content %}
+<div class="page-header"><h2><i class="bi bi-speedometer2 me-2"></i>System Dashboard</h2></div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card stat-card border-primary">
+            <div class="stat-value text-primary">{{ users_total }}</div>
+            <div class="stat-label">Total Users</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="stat-value">{{ students_total }}</div>
+            <div class="stat-label">Students</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="stat-value">{{ faculty_total }}</div>
+            <div class="stat-label">Faculty</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="stat-value">{{ admins_total }}</div>
+            <div class="stat-label">Administrators</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3"><div class="card stat-card"><div class="stat-value">{{ assignments_total }}</div><div class="stat-label">Assignments</div></div></div>
+    <div class="col-md-3"><div class="card stat-card"><div class="stat-value">{{ projects_total }}</div><div class="stat-label">Total Projects</div></div></div>
+    <div class="col-md-3"><div class="card stat-card text-success"><div class="stat-value">{{ completed_projects }}</div><div class="stat-label">Completed Projects</div></div></div>
+    <div class="col-md-3"><div class="card stat-card text-warning"><div class="stat-value">{{ pending_projects }}</div><div class="stat-label">Proposals Under Review</div></div></div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header"><h5 class="mb-0"><i class="bi bi-pie-chart me-2"></i>Projects by Status</h5></div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                {% for p in projects_by_status %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span class="badge-status {{ p['status']|status_class }}">{{ p['status']|status_display }}</span>
+                        <span class="badge bg-secondary rounded-pill">{{ p['c'] }}</span>
+                    </li>
+                {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Recent Projects</h5>
+                <a href="{{ url_for('admin.projects') }}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="card-body">
+                {% if recent_projects %}
+                <ul class="list-group list-group-flush">
+                {% for p in recent_projects %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <a href="{{ url_for('admin.project_detail', project_id=p['project_id']) }}">{{ p['title'] }}</a>
+                            <br><small class="text-muted">{{ p['updated_at']|format_datetime }}</small>
+                        </div>
+                        <span class="badge-status {{ p['status']|status_class }}">{{ p['status']|status_display }}</span>
+                    </li>
+                {% endfor %}
+                </ul>
+                {% else %}
+                <div class="empty-state py-3"><p class="mb-0 text-muted">No projects found.</p></div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

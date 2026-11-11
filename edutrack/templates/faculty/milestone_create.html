@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Create Milestone — EduTrack{% endblock %}
+
+{% block content %}
+<div class="page-header"><h2><i class="bi bi-flag me-2"></i>Create Milestone for {{ project['title'] }}</h2></div>
+<div class="row"><div class="col-md-8">
+<div class="card"><div class="card-body">
+    <form method="POST">
+        <div class="mb-3"><label class="form-label">Title</label><input type="text" class="form-control" name="title" required></div>
+        <div class="mb-3"><label class="form-label">Description</label><textarea class="form-control" name="description" rows="3"></textarea></div>
+        <div class="mb-3"><label class="form-label">Due Date</label><input type="date" class="form-control" name="due_date"></div>
+        <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle me-1"></i>Create Milestone</button>
+        <a href="{{ url_for('faculty.project_detail', project_id=project['project_id']) }}" class="btn btn-outline-secondary ms-2">Cancel</a>
+    </form>
+</div></div>
+</div></div>
+{% endblock %}

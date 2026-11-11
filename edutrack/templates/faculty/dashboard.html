@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}Faculty Dashboard — EduTrack{% endblock %}
+
+{% block content %}
+<div class="page-header"><h2><i class="bi bi-speedometer2 me-2"></i>Faculty Dashboard</h2></div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3"><div class="card stat-card"><div class="stat-value">{{ assignments_count }}</div><div class="stat-label">Assignments</div></div></div>
+    <div class="col-md-3"><div class="card stat-card"><div class="stat-value">{{ projects_count }}</div><div class="stat-label">Total Projects</div></div></div>
+    <div class="col-md-3"><div class="card stat-card" style="border-left-color: var(--warning);"><div class="stat-value">{{ pending_reviews_count }}</div><div class="stat-label">Pending Reviews</div></div></div>
+    <div class="col-md-3"><div class="card stat-card"><div class="stat-value">{{ recent_submissions|length }}</div><div class="stat-label">Recent Submissions</div></div></div>
+</div>
+
+<!-- Pending Proposal Reviews -->
+<div class="card mb-4">
+    <div class="card-header"><h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Pending Proposal Reviews</h5></div>
+    <div class="card-body">
+        {% if pending_projects %}
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead><tr><th>Project</th><th>Team</th><th>Assignment</th><th>Submitted</th><th>Actions</th></tr></thead>
+                <tbody>
+                {% for p in pending_projects %}
+                <tr>
+                    <td>{{ p['title'] }}</td>
+                    <td>{{ p['team_name'] }}</td>
+                    <td>{{ p['assignment_title'] }}</td>
+                    <td>{{ p['submitted_at']|format_datetime }}</td>
+                    <td><a href="{{ url_for('faculty.project_detail', project_id=p['project_id']) }}" class="btn btn-sm btn-outline-primary">Review</a></td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state"><i class="bi bi-check-circle"></i><p>No proposals awaiting review.</p></div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Recent Submissions -->
+<div class="card mb-4">
+    <div class="card-header"><h5 class="mb-0"><i class="bi bi-file-earmark-arrow-up me-2"></i>Recent Submissions</h5></div>
+    <div class="card-body">
+        {% if recent_submissions %}
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead><tr><th>File</th><th>Project</th><th>Milestone</th><th>Student</th><th>Date</th><th></th></tr></thead>
+                <tbody>
+                {% for s in recent_submissions %}
+                <tr>
+                    <td>{{ s['original_filename'] or 'N/A' }}</td>
+                    <td>{{ s['project_title'] }}</td>
+                    <td>{{ s['milestone_title'] or '—' }}</td>
+                    <td>{{ s['student_name'] }}</td>
+                    <td>{{ s['submitted_at']|format_datetime }}</td>
+                    <td><a href="{{ url_for('faculty.submission_detail', submission_id=s['submission_id']) }}" class="btn btn-sm btn-outline-primary">View</a></td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state"><i class="bi bi-file-earmark"></i><p>No recent submissions.</p></div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- My Assignments -->
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="bi bi-journal-text me-2"></i>My Assignments</h5>
+        <a href="{{ url_for('faculty.assignments') }}" class="btn btn-sm btn-outline-primary">View All</a>
+    </div>
+    <div class="card-body">
+        {% if my_assignments %}
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead><tr><th>Title</th><th>Status</th><th>Projects</th><th>Deadline</th></tr></thead>
+                <tbody>
+                {% for a in my_assignments %}
+                <tr>
+                    <td><a href="{{ url_for('faculty.assignment_detail', assignment_id=a['assignment_id']) }}">{{ a['title'] }}</a></td>
+                    <td><span class="badge-status {{ a['status']|status_class }}">{{ a['status'] }}</span></td>
+                    <td>{{ a['projects_count'] }}</td>
+                    <td>{{ a['deadline']|format_date }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state"><i class="bi bi-journal-x"></i><p>No assignments created yet.</p></div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

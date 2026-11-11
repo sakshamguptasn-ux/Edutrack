@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block title %}Project Detail — EduTrack{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>{{ project['title'] }} <span class="badge-status {{ project['status']|status_class }}">{{ project['status']|status_display }}</span></h2>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3"><div class="card p-3"><strong>Assignment</strong><br>{{ project['assignment_title'] }}</div></div>
+    <div class="col-md-3"><div class="card p-3"><strong>Team</strong><br>{{ project['team_name'] }}</div></div>
+    <div class="col-md-3"><div class="card p-3"><strong>Faculty</strong><br>{{ project['faculty_name'] }}</div></div>
+    <div class="col-md-3"><div class="card p-3"><strong>Created</strong><br>{{ project['created_at']|format_date }}</div></div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header"><h5 class="mb-0">Team Members</h5></div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                {% for m in team_members %}
+                    <li class="list-group-item"><i class="bi bi-person me-2"></i>{{ m['name'] }} ({{ m['email'] }})</li>
+                {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header"><h5 class="mb-0"><i class="bi bi-trophy me-2"></i>Evaluation</h5></div>
+            <div class="card-body">
+                {% if evaluation %}
+                <h4>Grade: <span class="text-primary">{{ evaluation['grade'] }}</span></h4>
+                <p>{{ evaluation['comments'] }}</p>
+                <small class="text-muted">By {{ evaluation['faculty_name'] }} on {{ evaluation['evaluated_at']|format_datetime }}</small>
+                {% else %}
+                <div class="empty-state py-3"><p class="mb-0 text-muted">Not yet evaluated.</p></div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Proposal Review History -->
+<div class="card mb-4">
+    <div class="card-header"><h5 class="mb-0"><i class="bi bi-file-text me-2"></i>Proposal Review History</h5></div>
+    <div class="card-body">
+        {% if reviews %}
+        {% for r in reviews %}
+        <div class="review-entry {{ 'approved' if r['decision'] == 'APPROVED' else 'revision' }}">
+            <div class="d-flex justify-content-between">
+                <span>
+                    <span class="badge-status {{ 'badge-approved' if r['decision'] == 'APPROVED' else 'badge-revision' }}">{{ r['decision']|status_display }}</span>
+                    <strong class="ms-2">{{ r['faculty_name'] }}</strong>
+                </span>
+                <small class="text-muted">{{ r['created_at']|format_datetime }}</small>
+            </div>
+            <p class="mt-1 mb-0">{{ r['comment'] }}</p>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="empty-state py-3"><p class="mb-0 text-muted">No proposal reviews.</p></div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Milestones -->
+<div class="card mb-4">
+    <div class="card-header"><h5 class="mb-0"><i class="bi bi-flag me-2"></i>Milestones</h5></div>
+    <div class="card-body">
+        {% if milestones %}
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead><tr><th>Title</th><th>Due Date</th><th>Status</th></tr></thead>
+                <tbody>
+                {% for m in milestones %}
+                <tr>
+                    <td>{{ m['title'] }}<br><small class="text-muted">{{ m['description']|truncate(60) if m['description'] }}</small></td>
+                    <td>{{ m['due_date']|format_date }}</td>
+                    <td><span class="badge-status {{ m['status']|status_class }}">{{ m['status']|status_display }}</span></td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state py-3"><p class="mb-0 text-muted">No milestones.</p></div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Submissions -->
+<div class="card mb-4">
+    <div class="card-header"><h5 class="mb-0"><i class="bi bi-file-earmark-arrow-up me-2"></i>Submissions</h5></div>
+    <div class="card-body p-0">
+        {% if submissions %}
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead><tr><th>File</th><th>Type</th><th>Student</th><th>Status</th><th>Date</th></tr></thead>
+                <tbody>
+                {% for s in submissions %}
+                <tr>
+                    <td><a href="{{ url_for('auth.download_file', filename=s['stored_filename']) }}"><i class="bi bi-file-earmark me-1"></i>{{ s['original_filename'] }}</a></td>
+                    <td>{{ s['submission_type'] }}</td>
+                    <td>{{ s['student_name'] }}</td>
+                    <td><span class="badge-status {{ s['status']|status_class }}">{{ s['status']|status_display }}</span></td>
+                    <td>{{ s['submitted_at']|format_datetime }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state py-4"><i class="bi bi-file-earmark-x"></i><p>No submissions found.</p></div>
+        {% endif %}
+    </div>
+</div>
+
+<a href="{{ url_for('admin.projects') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back to Projects</a>
+{% endblock %}

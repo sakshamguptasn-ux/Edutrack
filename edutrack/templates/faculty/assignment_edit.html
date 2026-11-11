@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Edit Assignment — EduTrack{% endblock %}
+
+{% block content %}
+<div class="page-header"><h2><i class="bi bi-pencil me-2"></i>Edit Assignment</h2></div>
+<div class="row"><div class="col-md-8">
+<div class="card"><div class="card-body">
+    <form method="POST">
+        <div class="mb-3"><label class="form-label">Title</label><input type="text" class="form-control" name="title" value="{{ assignment['title'] }}" required></div>
+        <div class="mb-3"><label class="form-label">Description</label><textarea class="form-control" name="description" rows="3">{{ assignment['description'] or '' }}</textarea></div>
+        <div class="mb-3"><label class="form-label">Instructions</label><textarea class="form-control" name="instructions" rows="3">{{ assignment['instructions'] or '' }}</textarea></div>
+        <div class="mb-3"><label class="form-label">Deadline</label><input type="date" class="form-control" name="deadline" value="{{ assignment['deadline'] or '' }}"></div>
+        <div class="mb-3"><label class="form-label">Status</label>
+            <select class="form-select" name="status">
+                <option value="OPEN" {{ 'selected' if assignment['status'] == 'OPEN' }}>Open</option>
+                <option value="CLOSED" {{ 'selected' if assignment['status'] == 'CLOSED' }}>Closed</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle me-1"></i>Save Changes</button>
+        <a href="{{ url_for('faculty.assignment_detail', assignment_id=assignment['assignment_id']) }}" class="btn btn-outline-secondary ms-2">Cancel</a>
+    </form>
+</div></div>
+</div></div>
+{% endblock %}

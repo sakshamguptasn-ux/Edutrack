@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}System Reports — EduTrack{% endblock %}
+
+{% block content %}
+<div class="page-header"><h2><i class="bi bi-bar-chart me-2"></i>System Reports</h2></div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header"><h5 class="mb-0">Assignments Overview</h5></div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
+                    <span>Total Assignments</span><strong>{{ assignments_total }}</strong>
+                </div>
+                <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
+                    <span>Active (Open)</span><strong class="text-success">{{ assignments_open }}</strong>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span>Closed</span><strong class="text-danger">{{ assignments_closed }}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header"><h5 class="mb-0">Project Status Distribution</h5></div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                {% for p in projects_by_status %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <span class="badge-status {{ p['status']|status_class }}">{{ p['status']|status_display }}</span>
+                        <span class="badge bg-secondary rounded-pill">{{ p['c'] }}</span>
+                    </li>
+                {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header"><h5 class="mb-0">Evaluated Projects</h5></div>
+    <div class="card-body p-0">
+        {% if completed_with_grades %}
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead><tr><th>Project</th><th>Team</th><th>Faculty</th><th>Grade</th><th>Evaluated On</th></tr></thead>
+                <tbody>
+                {% for c in completed_with_grades %}
+                <tr>
+                    <td>{{ c['project_title'] }}</td>
+                    <td>{{ c['team_name'] }}</td>
+                    <td>{{ c['faculty_name'] }}</td>
+                    <td><strong>{{ c['grade'] }}</strong></td>
+                    <td>{{ c['evaluated_at']|format_date }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state"><i class="bi bi-trophy"></i><p>No evaluated projects yet.</p></div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
